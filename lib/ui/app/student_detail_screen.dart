@@ -23,7 +23,7 @@ class StudentDetailScreen extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
                 child: Image.file(
-                  File(student.imageUrl!),
+                  File(student.imageUrl),
                   width: 200,
                   height: 200,
                   fit: BoxFit.cover,
@@ -39,7 +39,7 @@ class StudentDetailScreen extends StatelessWidget {
             ),
             SizedBox(height: 8.0),
             Text(
-              'Mã sinh viên: ${student.id}',
+              'Mã sinh viên: ${student.mssv}',
               style: TextStyle(fontSize: 18.0),
             ),
             SizedBox(height: 8.0),

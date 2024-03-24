@@ -38,7 +38,10 @@ class StudentService extends FirebaseService {
         '$databaseUrl/students.json?auth=$token',
         method: HttpMethod.post,
         body: jsonEncode(
-          student.toJson(),
+          {
+            ...student.toJson(),
+            'mssv': student.mssv, // Bổ sung trường mssv vào dữ liệu gửi đi
+          },
         ),
       ) as Map<String, dynamic>?;
 
@@ -47,6 +50,7 @@ class StudentService extends FirebaseService {
         name: student.name,
         email: student.email,
         imageUrl: student.imageUrl,
+        mssv: student.mssv, // Lấy giá trị mssv từ đối tượng gửi đi
       );
     } catch (error) {
       print(error);
@@ -54,47 +58,32 @@ class StudentService extends FirebaseService {
     }
   }
 
-  Future<Student> updateStudent(Student student) async {
+  Future<void> deleteStudent(String id) async {
     try {
-      final String idToUpdate = student.id;
-      final url = '$databaseUrl/students/$idToUpdate.json?auth=$token';
-      final response = await http.put(
-        Uri.parse(url),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
-        body: json.encode(
-          student.toJson(),
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        return student;
-      } else {
-        throw Exception('Không thể cập nhật sinh viên: ${response.statusCode}');
-      }
-    } catch (error) {
-      throw Exception('Không thể cập nhật sinh viên: $error');
-    }
-  }
-
-  Future<void> deleteStudent(String studentId) async {
-    try {
-      final url = '$databaseUrl/students/$studentId.json?auth=$token';
+      print('Deleting student with ID: $id');
       final response = await http.delete(
-        Uri.parse(url),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
+        Uri.parse('$databaseUrl/students/$id.json?auth=$token'),
       );
 
-      if (response.statusCode == 200) {
-        print('Sinh viên đã được xóa thành công');
+      // In ra yêu cầu gửi đi
+      print(
+          'Request URL: ${Uri.parse('$databaseUrl/students/$id.json?auth=$token')}');
+      print('Request Method: DELETE');
+      print('Request Headers: ${response.headers}');
+
+      // In ra phản hồi từ máy chủ Firebase
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode != 200) {
+        print('Failed to delete student. Status code: ${response.statusCode}');
+        throw HttpException('Failed to delete student');
       } else {
-        throw Exception('Không thể xóa sinh viên: ${response.statusCode}');
+        print('Student deleted successfully.');
       }
     } catch (error) {
-      throw Exception('Không thể xóa sinh viên: $error');
+      print('Error deleting student: $error');
+      rethrow;
     }
   }
 }

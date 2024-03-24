@@ -60,7 +60,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                     final student = students[index];
                     return ListTile(
                       title: Text(student.name),
-                      subtitle: Text(student.id),
+                      subtitle: Text(student.mssv),
                       onTap: () {
                         _navigateToStudentDetail(context, student);
                       },
@@ -70,7 +70,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                           IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () {
-                              _confirmDelete(context, student);
+                              _confirmDelete(context, student.id);
                             },
                           ),
                         ],
@@ -98,7 +98,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
     );
   }
 
-  Future<void> _confirmDelete(BuildContext context, Student student) async {
+  Future<void> _confirmDelete(BuildContext context, String studentId) async {
     final bool confirm = await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -110,7 +110,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
             ),
           ),
           content: Text(
-            "Bạn có chắc muốn xóa sinh viên ${student.name}?",
+            "Bạn có chắc muốn xóa sinh viên có ID là $studentId?",
             style: TextStyle(
               color: Colors.black,
             ),
@@ -143,28 +143,27 @@ class _StudentListScreenState extends State<StudentListScreen> {
     );
 
     if (confirm) {
-      await _deleteStudent(context, student);
+      await _deleteStudent(context, studentId);
     }
   }
 
-  Future<void> _deleteStudent(BuildContext context, Student student) async {
+  Future<void> _deleteStudent(BuildContext context, String studentId) async {
     try {
       final studentManager =
           Provider.of<StudentManager>(context, listen: false);
-      await studentManager.deleteStudent(student.id);
+      await studentManager.deleteStudent(studentId);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Xóa sinh viên thành công'),
           duration: Duration(seconds: 2),
           action: SnackBarAction(
             label: 'Ẩn',
-            onPressed: () {
-              // Nếu bạn muốn cài đặt lại sinh viên, hãy thêm mã ở đây
-            },
+            onPressed: () {},
           ),
         ),
       );
     } catch (error) {
+      print('Error deleting student: $error'); // In ra chi tiết lỗi
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Không thể xóa sinh viên'),

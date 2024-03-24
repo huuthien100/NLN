@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'main_sceen.dart';
 import 'student_manager.dart';
+import 'package:uuid/uuid.dart';
 import '../../models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,24 +18,24 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   late File _imageFile;
   final _imagePicker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _idController;
   late TextEditingController _nameController;
   late TextEditingController _emailController;
+  late TextEditingController _mssvController;
 
   @override
   void initState() {
     super.initState();
-    _idController = TextEditingController();
     _nameController = TextEditingController();
     _emailController = TextEditingController();
-    _imageFile = File(''); // Initialize with a default empty file
+    _mssvController = TextEditingController();
+    _imageFile = File('');
   }
 
   @override
   void dispose() {
-    _idController.dispose();
     _nameController.dispose();
     _emailController.dispose();
+    _mssvController.dispose();
     super.dispose();
   }
 
@@ -59,10 +60,11 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
           Provider.of<StudentManager>(context, listen: false);
 
       final newStudent = Student(
-        id: _idController.text,
+        id: const Uuid().v4(),
         name: _nameController.text,
         email: _emailController.text,
         imageUrl: _imageFile.path,
+        mssv: _mssvController.text,
       );
 
       try {
@@ -110,7 +112,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 TextFormField(
-                  controller: _idController,
+                  controller: _mssvController,
                   decoration: InputDecoration(labelText: 'Mã Sinh Viên'),
                   validator: (value) {
                     if (value!.isEmpty) {

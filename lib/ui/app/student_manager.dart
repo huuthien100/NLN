@@ -47,35 +47,15 @@ class StudentManager with ChangeNotifier {
     }
   }
 
-  Future<void> updateStudent(Student student,
-      {File? image, String? imageName}) async {
+  Future<void> deleteStudent(String id) async {
     try {
-      if (image != null) {
-        final imagePath = await _saveImageLocally(image, imageName!);
-        student = student.copyWith(imageUrl: imagePath);
-      }
-
-      await _studentService.updateStudent(student);
-
-      final index = _students.indexWhere((item) => item.id == student.id);
-      if (index != -1) {
-        _students[index] = student;
-        notifyListeners();
-      }
-    } catch (error) {
-      print('Error editing student: $error');
-      throw error;
-    }
-  }
-
-  Future<void> deleteStudent(String studentId) async {
-    try {
-      await _studentService.deleteStudent(studentId);
-      _students.removeWhere((student) => student.id == studentId);
+      print('Deleting student with ID: $id');
+      await _studentService.deleteStudent(id);
+      _students.removeWhere((student) => student.id == id);
       notifyListeners();
+      print('Student with ID $id deleted successfully');
     } catch (error) {
       print('Error deleting student: $error');
-      throw error;
     }
   }
 

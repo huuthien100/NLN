@@ -2,6 +2,7 @@ import 'ui/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+// ignore_for_file: use_key_in_widget_constructors
 
 Future<void> main() async {
   await dotenv.load();
@@ -16,7 +17,13 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (ctx) => AuthManager()),
-        ChangeNotifierProvider(create: (ctx) => StudentManager()),
+        ChangeNotifierProxyProvider<AuthManager, StudentManager>(
+          create: (ctx) => StudentManager(),
+          update: (ctx, authManager, studentManager) {
+            studentManager!.authToken = authManager.authToken;
+            return studentManager;
+          },
+        ),
       ],
       child: Consumer<AuthManager>(
         builder: (context, authManager, child) {
@@ -29,7 +36,7 @@ class MyApp extends StatelessWidget {
           );
 
           return MaterialApp(
-            title: 'Attendance App',
+            title: 'MyShop',
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               fontFamily: 'Lato',
@@ -52,11 +59,23 @@ class MyApp extends StatelessWidget {
                 ),
               ),
             ),
-            home: authManager.isAuth ? MainScreen() : const AuthScreen(),
+            home: authManager.isAuth
+                ? const MainScreen()
+                : FutureBuilder(
+                    future: authManager.tryAutoLogin(),
+                    builder: (context, snapshot) {
+                      return snapshot.connectionState == ConnectionState.waiting
+                          ? const SplashScreen()
+                          : const AuthScreen();
+                    },
+                  ),
             routes: {
-              '/add-student': (ctx) => AddStudentScreen(),
-              '/student-list': (ctx) => StudentListScreen(),
-              '/student-detail': (ctx) => StudentDetailScreen(),
+              AddStudentScreen.routeName: (ctx) =>
+                  const SafeArea(child: AddStudentScreen()),
+              StudentListScreen.routeName: (ctx) =>
+                  const SafeArea(child: StudentListScreen()),
+              StudentDetailScreen.routeName: (ctx) =>
+                  const SafeArea(child: StudentDetailScreen()),
             },
           );
         },

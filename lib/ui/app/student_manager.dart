@@ -1,7 +1,7 @@
 import 'dart:io';
 import '../../models/student.dart';
 import '../../models/auth_token.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../../services/student_service.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -43,19 +43,21 @@ class StudentManager with ChangeNotifier {
         notifyListeners();
       }
     } catch (error) {
-      print('Error adding student: $error');
+      if (kDebugMode) {
+        print('Error adding student: $error');
+      }
     }
   }
 
   Future<void> deleteStudent(String id) async {
-    try {
-      print('Deleting student with ID: $id');
-      await _studentService.deleteStudent(id);
-      _students.removeWhere((student) => student.id == id);
+    final index = _students.indexWhere((item) => item.id == id);
+    Student? existingProduct = _students[index];
+    _students.removeAt(index);
+    notifyListeners();
+
+    if (!await _studentService.deleteStudent(id)) {
+      _students.insert(index, existingProduct);
       notifyListeners();
-      print('Student with ID $id deleted successfully');
-    } catch (error) {
-      print('Error deleting student: $error');
     }
   }
 

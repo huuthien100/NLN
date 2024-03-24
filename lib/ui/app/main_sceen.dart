@@ -3,6 +3,8 @@ import '../../main.dart' as app;
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatelessWidget {
+  const MainScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final AuthManager authManager = AuthManager();
@@ -26,7 +28,7 @@ class MainScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => AddStudentScreen()));
+                        builder: (context) => const AddStudentScreen()));
               },
             ),
             buildMenuItem(
@@ -35,7 +37,7 @@ class MainScreen extends StatelessWidget {
               title: 'Điểm danh sinh viên',
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CheckOut()));
+                    MaterialPageRoute(builder: (context) => const CheckOut()));
               },
             ),
             buildMenuItem(
@@ -46,7 +48,7 @@ class MainScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => AttendanceScreen()));
+                        builder: (context) => const AttendanceScreen()));
               },
             ),
             buildMenuItem(
@@ -58,7 +60,8 @@ class MainScreen extends StatelessWidget {
                 // Hành động khi mục được nhấp
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => StudentListScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const StudentListScreen()),
                 );
               },
             ),
@@ -70,7 +73,7 @@ class MainScreen extends StatelessWidget {
                 authManager.logout();
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => app.MyApp()),
+                  MaterialPageRoute(builder: (context) => const app.MyApp()),
                 );
               },
             ),

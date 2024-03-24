@@ -3,10 +3,9 @@ import 'dart:convert';
 import '../models/auth_token.dart';
 import '../models/http_exception.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
 
 class AuthService {
   static const _authTokenKey = 'authToken';
@@ -44,7 +43,9 @@ class AuthService {
 
       return authToken;
     } catch (error) {
-      print(error);
+      if (kDebugMode) {
+        print(error);
+      }
       rethrow;
     }
   }

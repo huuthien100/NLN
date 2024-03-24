@@ -5,10 +5,14 @@ import 'package:uuid/uuid.dart';
 import '../../models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 class AddStudentScreen extends StatefulWidget {
   static const routeName = '/add-student';
+
+  const AddStudentScreen({super.key});
 
   @override
   _AddStudentScreenState createState() => _AddStudentScreenState();
@@ -75,7 +79,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Thêm sinh viên thành công.'),
             duration: Duration(seconds: 2),
           ),
@@ -83,10 +87,12 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       } catch (error) {
-        print('Error saving student: $error');
+        if (kDebugMode) {
+          print('Error saving student: $error');
+        }
       }
     }
   }
@@ -95,17 +101,17 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Thêm Sinh Viên'),
+        title: const Text('Thêm Sinh Viên'),
         actions: [
           IconButton(
             onPressed: () => _saveStudent(context),
-            icon: Icon(Icons.save),
+            icon: const Icon(Icons.save),
           ),
         ],
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -113,7 +119,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               children: <Widget>[
                 TextFormField(
                   controller: _mssvController,
-                  decoration: InputDecoration(labelText: 'Mã Sinh Viên'),
+                  decoration: const InputDecoration(labelText: 'Mã Sinh Viên'),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Vui lòng nhập mã sinh viên';
@@ -123,7 +129,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                 ),
                 TextFormField(
                   controller: _nameController,
-                  decoration: InputDecoration(labelText: 'Họ và Tên'),
+                  decoration: const InputDecoration(labelText: 'Họ và Tên'),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Vui lòng nhập họ và tên';
@@ -133,7 +139,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                 ),
                 TextFormField(
                   controller: _emailController,
-                  decoration: InputDecoration(labelText: 'Email'),
+                  decoration: const InputDecoration(labelText: 'Email'),
                   validator: (value) {
                     if (value!.isEmpty || !value.contains('@')) {
                       return 'Vui lòng nhập địa chỉ email hợp lệ';
@@ -141,7 +147,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _imageFile.path.isNotEmpty
                     ? Image.file(
                         _imageFile,
@@ -149,13 +155,13 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                         width: double.infinity,
                         fit: BoxFit.cover,
                       )
-                    : SizedBox(),
-                SizedBox(height: 20),
+                    : const SizedBox(),
+                const SizedBox(height: 20),
                 Center(
                   child: ElevatedButton.icon(
                     onPressed: _takePicture,
-                    icon: Icon(Icons.camera),
-                    label: Text('Chụp Ảnh'),
+                    icon: const Icon(Icons.camera),
+                    label: const Text('Chụp Ảnh'),
                   ),
                 ),
               ],

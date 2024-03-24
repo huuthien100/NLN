@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 class StudentDetailScreen extends StatelessWidget {
   static const routeName = '/student-detail';
 
+  const StudentDetailScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final Student student =
@@ -12,10 +14,10 @@ class StudentDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chi tiết sinh viên'),
+        title: const Text('Chi tiết sinh viên'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -30,22 +32,22 @@ class StudentDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Text(
               'Tên: ${student.name}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20.0,
               ),
             ),
-            SizedBox(height: 8.0),
+            const SizedBox(height: 8.0),
             Text(
               'Mã sinh viên: ${student.mssv}',
-              style: TextStyle(fontSize: 18.0),
+              style: const TextStyle(fontSize: 18.0),
             ),
-            SizedBox(height: 8.0),
+            const SizedBox(height: 8.0),
             Text(
               'Email: ${student.email}',
-              style: TextStyle(fontSize: 18.0),
+              style: const TextStyle(fontSize: 18.0),
             ),
           ],
         ),

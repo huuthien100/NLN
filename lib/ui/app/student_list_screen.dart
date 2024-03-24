@@ -2,9 +2,13 @@ import '../screens.dart';
 import '../../models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart';
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 class StudentListScreen extends StatefulWidget {
   static const routeName = '/student-list';
+
+  const StudentListScreen({super.key});
 
   @override
   _StudentListScreenState createState() => _StudentListScreenState();
@@ -28,7 +32,9 @@ class _StudentListScreenState extends State<StudentListScreen> {
           Provider.of<StudentManager>(context, listen: false);
       await studentManager.fetchStudents();
     } catch (error) {
-      print('Lỗi khi tải danh sách sinh viên: $error');
+      if (kDebugMode) {
+        print('Lỗi khi tải danh sách sinh viên: $error');
+      }
     }
     if (mounted) {
       setState(() {
@@ -44,14 +50,14 @@ class _StudentListScreenState extends State<StudentListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Danh sách sinh viên'),
+        title: const Text('Danh sách sinh viên'),
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : students.isEmpty
-              ? Center(
+              ? const Center(
                   child: Text('Không tìm thấy sinh viên nào.'),
                 )
               : ListView.builder(
@@ -68,7 +74,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.delete),
+                            icon: const Icon(Icons.delete),
                             onPressed: () {
                               _confirmDelete(context, student.id);
                             },
@@ -82,7 +88,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
         onPressed: () {
           _navigateToAddScreen(context);
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -103,7 +109,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
+          title: const Text(
             "Xác nhận Xóa",
             style: TextStyle(
               color: Colors.black,
@@ -111,7 +117,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
           ),
           content: Text(
             "Bạn có chắc muốn xóa sinh viên có ID là $studentId?",
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.black,
             ),
           ),
@@ -121,7 +127,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text(
+              child: const Text(
                 "Hủy",
                 style: TextStyle(
                   color: Colors.black,
@@ -132,7 +138,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text(
+              child: const Text(
                 "Xóa",
                 style: TextStyle(color: Colors.red),
               ),
@@ -154,8 +160,8 @@ class _StudentListScreenState extends State<StudentListScreen> {
       await studentManager.deleteStudent(studentId);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Xóa sinh viên thành công'),
-          duration: Duration(seconds: 2),
+          content: const Text('Xóa sinh viên thành công'),
+          duration: const Duration(seconds: 2),
           action: SnackBarAction(
             label: 'Ẩn',
             onPressed: () {},
@@ -163,9 +169,11 @@ class _StudentListScreenState extends State<StudentListScreen> {
         ),
       );
     } catch (error) {
-      print('Error deleting student: $error'); // In ra chi tiết lỗi
+      if (kDebugMode) {
+        print('Error deleting student: $error');
+      } // In ra chi tiết lỗi
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Không thể xóa sinh viên'),
           duration: Duration(seconds: 2),
         ),

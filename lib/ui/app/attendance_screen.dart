@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'attendance_detail_screen.dart';
+// ignore_for_file: library_private_types_in_public_api
 
 class AttendanceScreen extends StatefulWidget {
+  const AttendanceScreen({super.key});
+
   @override
   _AttendanceScreenState createState() => _AttendanceScreenState();
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
   int _currentPage = 0;
-  int _itemsPerPage = 6; // Number of items per page
+  final int _itemsPerPage = 6; // Number of items per page
   late int _totalPages; // Total number of pages
 
   @override
@@ -42,7 +45,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Thông tin buổi điểm danh'),
+        title: const Text('Thông tin buổi điểm danh'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -68,7 +71,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             attendanceList[itemIndex].split(' ')[0],
                             attendanceList[itemIndex].split(' ')[1]);
                       } else {
-                        return SizedBox(); // Return empty container if no more items
+                        return const SizedBox(); // Return empty container if no more items
                       }
                     },
                   );
@@ -93,8 +96,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         );
       },
       child: Container(
-        padding: EdgeInsets.all(16),
-        margin: EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).primaryColor),
           borderRadius: BorderRadius.circular(10),
@@ -104,12 +107,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           children: [
             Text(
               'Ngày: $date',
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               'Giờ: $time',
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
           ],
         ),
@@ -126,7 +129,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           return Container(
             width: 8.0,
             height: 8.0,
-            margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+            margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: _currentPage == index ? Colors.blueAccent : Colors.grey,

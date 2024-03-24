@@ -1,6 +1,7 @@
 import 'auth_card.dart';
 import 'app_banner.dart';
 import 'package:flutter/material.dart';
+// ignore_for_file: use_key_in_widget_constructors
 
 class AuthScreen extends StatelessWidget {
   static const routeName = '/auth';

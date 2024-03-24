@@ -4,38 +4,39 @@ class AttendanceDetailItemScreen extends StatelessWidget {
   final String date;
   final String time;
 
-  const AttendanceDetailItemScreen({required this.date, required this.time});
+  const AttendanceDetailItemScreen(
+      {super.key, required this.date, required this.time});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chi tiết buổi điểm danh'),
+        title: const Text('Chi tiết buổi điểm danh'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Thông tin buổi điểm danh',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               'Ngày: $date',
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
             Text(
               'Giờ: $time',
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Danh sách sinh viên đã điểm danh',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(
               child: ListView.builder(
                 itemCount: 20, // Số lượng sinh viên

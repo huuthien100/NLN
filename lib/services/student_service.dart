@@ -2,11 +2,10 @@ import 'dart:io';
 import 'dart:convert';
 import 'firebase_service.dart';
 import '../models/student.dart';
-import '../models/auth_token.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
 class StudentService extends FirebaseService {
-  StudentService([AuthToken? authToken]) : super(authToken);
+  StudentService([super.authToken]);
 
   Future<List<Student>> fetchStudents() async {
     final List<Student> students = [];
@@ -27,7 +26,9 @@ class StudentService extends FirebaseService {
 
       return students;
     } catch (error) {
-      print(error);
+      if (kDebugMode) {
+        print(error);
+      }
       return students;
     }
   }
@@ -40,7 +41,6 @@ class StudentService extends FirebaseService {
         body: jsonEncode(
           {
             ...student.toJson(),
-            'mssv': student.mssv, // Bổ sung trường mssv vào dữ liệu gửi đi
           },
         ),
       ) as Map<String, dynamic>?;
@@ -50,40 +50,28 @@ class StudentService extends FirebaseService {
         name: student.name,
         email: student.email,
         imageUrl: student.imageUrl,
-        mssv: student.mssv, // Lấy giá trị mssv từ đối tượng gửi đi
+        mssv: student.mssv,
       );
     } catch (error) {
-      print(error);
+      if (kDebugMode) {
+        print(error);
+      }
       return null;
     }
   }
 
-  Future<void> deleteStudent(String id) async {
+  Future<bool> deleteStudent(String id) async {
     try {
-      print('Deleting student with ID: $id');
-      final response = await http.delete(
-        Uri.parse('$databaseUrl/students/$id.json?auth=$token'),
+      await httpFetch(
+        '$databaseUrl/students/$id.json?auth=$token',
+        method: HttpMethod.delete,
       );
-
-      // In ra yêu cầu gửi đi
-      print(
-          'Request URL: ${Uri.parse('$databaseUrl/students/$id.json?auth=$token')}');
-      print('Request Method: DELETE');
-      print('Request Headers: ${response.headers}');
-
-      // In ra phản hồi từ máy chủ Firebase
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-
-      if (response.statusCode != 200) {
-        print('Failed to delete student. Status code: ${response.statusCode}');
-        throw HttpException('Failed to delete student');
-      } else {
-        print('Student deleted successfully.');
-      }
+      return true;
     } catch (error) {
-      print('Error deleting student: $error');
-      rethrow;
+      if (kDebugMode) {
+        print(error);
+      }
+      return false;
     }
   }
 }

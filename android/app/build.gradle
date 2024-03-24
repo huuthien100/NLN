@@ -21,8 +21,8 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
-
 android {
+    compileSdkVersion 31
     namespace "com.example.attendance_app"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
@@ -64,4 +64,5 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+}

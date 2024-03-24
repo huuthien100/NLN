@@ -16,22 +16,12 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (ctx) => AuthManager()),
+        ChangeNotifierProvider(create: (ctx) => StudentManager()),
       ],
       child: Consumer<AuthManager>(
         builder: (context, authManager, child) {
           final colorScheme = ColorScheme.fromSwatch(
-            primarySwatch: const MaterialColor(0xFF42A5F5, {
-              50: Color(0xFFE3F2FD),
-              100: Color(0xFFBBDEFB),
-              200: Color(0xFF90CAF9),
-              300: Color(0xFF64B5F6),
-              400: Color(0xFF42A5F5),
-              500: Color(0xFF2196F3),
-              600: Color(0xFF1E88E5),
-              700: Color(0xFF1976D2),
-              800: Color(0xFF1565C0),
-              900: Color(0xFF0D47A1),
-            }),
+            primarySwatch: Colors.blue,
           ).copyWith(
             secondary: Colors.deepOrange,
             background: Colors.white,
@@ -39,14 +29,14 @@ class MyApp extends StatelessWidget {
           );
 
           return MaterialApp(
-            title: 'Điểm Danh',
+            title: 'Attendance App',
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               fontFamily: 'Lato',
               colorScheme: colorScheme,
               appBarTheme: AppBarTheme(
                 backgroundColor: colorScheme.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: colorScheme.onPrimary,
                 elevation: 4,
                 shadowColor: colorScheme.shadow,
               ),
@@ -62,16 +52,12 @@ class MyApp extends StatelessWidget {
                 ),
               ),
             ),
-            home: authManager.isAuth
-                ? MainScreen()
-                : FutureBuilder(
-                    future: authManager.tryAutoLogin(),
-                    builder: (context, snapshot) {
-                      return snapshot.connectionState == ConnectionState.waiting
-                          ? const SplashScreen()
-                          : const AuthScreen();
-                    },
-                  ),
+            home: authManager.isAuth ? MainScreen() : const AuthScreen(),
+            routes: {
+              '/add-student': (ctx) => AddStudentScreen(),
+              '/student-list': (ctx) => StudentListScreen(),
+              '/student-detail': (ctx) => StudentDetailScreen(),
+            },
           );
         },
       ),

@@ -51,13 +51,26 @@ class MainScreen extends StatelessWidget {
             ),
             buildMenuItem(
               context: context,
+              icon: Icons
+                  .list, // Đây là nơi bạn thêm icon cho mục "Danh sách sinh viên"
+              title: 'Danh sách sinh viên', // Tiêu đề của mục
+              onTap: () {
+                // Hành động khi mục được nhấp
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StudentListScreen()),
+                );
+              },
+            ),
+            buildMenuItem(
+              context: context,
               icon: Icons.exit_to_app,
               title: 'Logout',
               onTap: () {
                 authManager.logout();
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const app.MyApp()),
+                  MaterialPageRoute(builder: (context) => app.MyApp()),
                 );
               },
             ),

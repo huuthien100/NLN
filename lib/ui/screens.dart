@@ -5,3 +5,6 @@ export 'app/main_sceen.dart';
 export 'app/attendance_screen.dart';
 export 'app/check_out.dart';
 export 'app/add_student_screen.dart';
+export 'app/student_list_screen.dart';
+export 'app/student_manager.dart';
+export 'app/student_detail_screen.dart';

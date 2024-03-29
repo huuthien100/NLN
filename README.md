@@ -1,16 +1,10 @@
-# attendance_app
+# Project niên luận - CNTT (CT466)
 
-A new Flutter project.
+Học kỳ 2, Năm học 2024-2025
 
-## Getting Started
+**MSSV**:B2014879
 
-This project is a starting point for a Flutter application.
+**Họ tên SV**:Nguyễn Hữu Thiên
 
-A few resources to get you started if this is your first Flutter project:
+**Tên dự án**: Ứng dụng điểm danh bằng nhận diện khuôn mặt
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

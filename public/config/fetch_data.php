@@ -19,4 +19,3 @@ try {
 } catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
 }
-?>

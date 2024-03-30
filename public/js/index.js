@@ -13,17 +13,21 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.log('Face detection and recognition models loaded successfully.');
         } catch (error) {
             console.error('Error loading face detection and recognition models:', error);
+            throw error;
         }
     }
 
     async function fetchData() {
         try {
             const response = await fetch('../config/fetch_data.php');
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
             const data = await response.json();
             return data;
         } catch (error) {
             console.error('Error fetching data:', error);
-            return [];
+            throw error;
         }
     }
 
@@ -44,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     
         return labeledDescriptors;
     }
-
+    
     async function loadFaceMatcher(data) {
         try {
             console.log('Initializing face matcher...');
@@ -53,6 +57,29 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.log('Face matcher initialized successfully.');
         } catch (error) {
             console.error('Error initializing face matcher:', error);
+            throw error;
+        }
+    }
+
+    async function markAttendance(studentname, date, status) {
+        try {
+            const response = await fetch('../config/mark_attendance.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    studentname: studentname,
+                    date: date,
+                    status: status
+                })
+            });
+            if (!response.ok) {
+                throw new Error('Failed to mark attendance');
+            }
+            console.log('Attendance marked successfully for student:', studentname);
+        } catch (error) {
+            console.error('Error marking attendance:', error);
         }
     }
 
@@ -74,7 +101,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     video.addEventListener('playing', async () => {
-
         canvas = faceapi.createCanvasFromMedia(video);
         document.body.appendChild(canvas);
         const displaySize = {
@@ -87,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             canvas.getContext('2d').clearRect(0, 0, displaySize.width, displaySize.height);
 
-            resizedDetections.forEach(detection => {
+            for (const detection of resizedDetections) {
                 const adjustedBox = {
                     x: video.videoWidth - (detection.detection.box.x + detection.detection.box.width),
                     y: detection.detection.box.y,
@@ -96,19 +122,33 @@ document.addEventListener('DOMContentLoaded', async function () {
                 };
                 const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
 
+                console.log('Face detected:', {
+                    label: bestMatch.toString(),
+                    detectionBox: detection.detection.box,
+                    landmarks: detection.landmarks
+                });
+
                 const drawBox = new faceapi.draw.DrawBox(adjustedBox, { label: bestMatch.toString() });
                 drawBox.draw(canvas);
-            });
-        }, 1);
+
+                if (bestMatch.label !== 'unknown') {
+                    await markAttendance(bestMatch.label,new Date().toISOString(),'Checked');
+                }
+            }
+        }, 1000);
 
         video.style.transform = 'scaleX(-1)';
     });
 
     async function initialize() {
-        const data = await fetchData();
-        await loadModels();
-        await loadFaceMatcher(data);
-        getCameraStream();
+        try {
+            const data = await fetchData();
+            await loadModels();
+            await loadFaceMatcher(data);
+            getCameraStream();
+        } catch (error) {
+            console.error('Error initializing:', error);
+        }
     }
 
     initialize();

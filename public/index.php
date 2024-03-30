@@ -6,7 +6,7 @@ use App\Models\AttendanceModel;
 use App\Models\StudentModel;
 
 require '../vendor/autoload.php';
-require '../config/connect.php';
+require 'config/connect.php';
 require '../app/Views/includes/sidebar.php';
 
 $attendanceController = new AttendanceController(new AttendanceModel($pdo));
@@ -35,7 +35,7 @@ if (isset($_GET['page'])) {
             require_once __DIR__ . '../../app/views/manage/list_students.php';
             break;
         case 'attendance_session':
-            $students = $attendanceController->getAllAttendances();
+            $attendances = $attendanceController->getAllAttendances();
             require_once __DIR__ . '../../app/views/attendance/attendance_session.php';
             break;
         default:

@@ -15,14 +15,9 @@ class AttendanceModel
 
     public function getAllAttendances()
     {
-        $stmt = $this->db->query('SELECT * FROM students');
+        $stmt = $this->db->query('SELECT students.*, attendances.date, attendances.status 
+                              FROM students 
+                              LEFT JOIN attendances ON students.id = attendances.student_id');
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function findAttendanceById($id)
-    {
-        $stmt = $this->db->prepare('SELECT * FROM students WHERE id = :id');
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

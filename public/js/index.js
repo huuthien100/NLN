@@ -33,22 +33,22 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     async function loadLabeledDescriptors(data) {
         const labeledDescriptors = [];
-    
+
         for (const dataItem of data) {
             const imagePath = dataItem.image_path;
             const img = await faceapi.fetchImage(imagePath);
             const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
-    
+
             if (detections) {
                 const descriptor = detections.descriptor;
-                const labeledDescriptor = new faceapi.LabeledFaceDescriptors(dataItem.student_name, [descriptor]);
+                const labeledDescriptor = new faceapi.LabeledFaceDescriptors(extractStudentName(dataItem.student_name), [descriptor]);
                 labeledDescriptors.push(labeledDescriptor);
             }
         }
-    
+
         return labeledDescriptors;
     }
-    
+
     async function loadFaceMatcher(data) {
         try {
             console.log('Initializing face matcher...');
@@ -81,6 +81,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         } catch (error) {
             console.error('Error marking attendance:', error);
         }
+    }
+
+    function extractStudentName(label) {
+        const regex = /^(.*?)\s\(\d+\.\d+\)$/;
+        const match = label.match(regex);
+        return match ? match[1] : label;
     }
 
     function getCameraStream() {
@@ -122,23 +128,19 @@ document.addEventListener('DOMContentLoaded', async function () {
                 };
                 const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
 
-                console.log('Face detected:', {
-                    label: bestMatch.toString(),
-                    detectionBox: detection.detection.box,
-                    landmarks: detection.landmarks
-                });
-
-                const drawBox = new faceapi.draw.DrawBox(adjustedBox, { label: bestMatch.toString() });
+                const drawBox = new faceapi.draw.DrawBox(adjustedBox, { label: extractStudentName(bestMatch.toString()) });
                 drawBox.draw(canvas);
 
                 if (bestMatch.label !== 'unknown') {
-                    await markAttendance(bestMatch.label,new Date().toISOString(),'Checked');
+                    await markAttendance(extractStudentName(bestMatch.toString()), new Date().toISOString(), 'Checked');
                 }
             }
         }, 1000);
 
         video.style.transform = 'scaleX(-1)';
     });
+
+    
 
     async function initialize() {
         try {

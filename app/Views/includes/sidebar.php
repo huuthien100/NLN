@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
     <title>Ứng dụng Điểm danh</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <?php if (isset($_GET['page']) && $_GET['page'] === 'attendance') : ?>
@@ -11,7 +12,7 @@
     <?php else : ?>
         <link rel="stylesheet" href="css/home.css">
     <?php endif; ?>
-
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
 </head>
 
 <body>
@@ -34,3 +35,6 @@
             </li>
         </ul>
     </nav>
+
+    <?php if (basename($_SERVER['PHP_SELF']) !== 'login.php') : ?>
+    <?php endif; ?>

@@ -19,14 +19,4 @@ class AttendanceController
 
         return $attendances;
     }
-
-    public function getAttendanceById($id)
-    {
-        $attendance = $this->attendanceModel->findAttendanceById($id);
-        if ($attendance !== false) {
-            return $attendance;
-        } else {
-            return false;
-        }
-    }
 }

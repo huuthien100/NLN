@@ -8,28 +8,37 @@ use PDOException;
 class StudentModel
 {
     protected $db;
+    protected $session;
 
-    public function __construct(PDO $db)
+    public function __construct(PDO $db, $session)
     {
         $this->db = $db;
+        $this->session = $session;
     }
     
     public function getAllStudents()
     {
-        $stmt = $this->db->query('SELECT * FROM students');
+        $user_id = $_SESSION['user_id'];
+
+        $stmt = $this->db->prepare('SELECT * FROM students WHERE user_id = :user_id');
+        $stmt->execute(['user_id' => $user_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getStudentById($id)
     {
-        $stmt = $this->db->prepare('SELECT * FROM students WHERE id = :id');
-        $stmt->execute(['id' => $id]);
+        $user_id = $_SESSION['user_id'];
+
+        $stmt = $this->db->prepare('SELECT * FROM students WHERE id = :id AND user_id = :user_id');
+        $stmt->execute(['id' => $id, 'user_id' => $user_id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function addStudent($studentData)
     {
-        $stmt = $this->db->prepare('INSERT INTO students (student_name, student_id, class, image_path) VALUES (:student_name, :student_id, :class, :image_path)');
+        $user_id = $_SESSION['user_id'];
+
+        $stmt = $this->db->prepare('INSERT INTO students (student_name, student_id, class, image_path, user_id) VALUES (:student_name, :student_id, :class, :image_path, :user_id)');
 
         $newFileName = $studentData['student_id'] . '.jpg';
         $studentImageDirectory = "img/studentImage/";
@@ -47,13 +56,16 @@ class StudentModel
             'student_name' => $studentData['student_name'],
             'student_id' => $studentData['student_id'],
             'class' => $studentData['class'],
-            'image_path' => $studentData['image_path']
+            'image_path' => $studentData['image_path'],
+            'user_id' => $user_id
         ]);
     }
 
     public function updateStudent($id, $studentData)
     {
         try {
+            $user_id = $_SESSION['user_id'];
+
             $newFileName = $studentData['student_id'] . '.jpg';
             $studentImageDirectory = "img/studentImage/";
             $imgUrl = $studentImageDirectory . $newFileName;
@@ -66,12 +78,13 @@ class StudentModel
 
             move_uploaded_file($_FILES['image_path']['tmp_name'], $studentImageDirectory . $newFileName);
 
-            $stmt = $this->db->prepare('UPDATE students SET student_name = :student_name, student_id = :student_id, class = :class, image_path = :image_path WHERE id = :id');
+            $stmt = $this->db->prepare('UPDATE students SET student_name = :student_name, student_id = :student_id, class = :class, image_path = :image_path WHERE id = :id AND user_id = :user_id');
             $stmt->bindParam(':id', $id);
             $stmt->bindParam(':student_name', $studentData['student_name']);
             $stmt->bindParam(':student_id', $studentData['student_id']);
             $stmt->bindParam(':class', $studentData['class']);
             $stmt->bindParam(':image_path', $studentData['image_path']);
+            $stmt->bindParam(':user_id', $user_id);
 
             return $stmt->execute();
         } catch (PDOException $e) {
@@ -82,9 +95,12 @@ class StudentModel
 
     public function deleteStudent($student_id)
     {
-        $sql_select_image_path = "SELECT image_path FROM students WHERE id = :student_id";
+        $user_id = $_SESSION['user_id'];
+
+        $sql_select_image_path = "SELECT image_path FROM students WHERE id = :student_id AND user_id = :user_id";
         $stmt_select_image_path = $this->db->prepare($sql_select_image_path);
         $stmt_select_image_path->bindParam(':student_id', $student_id);
+        $stmt_select_image_path->bindParam(':user_id', $user_id);
         $stmt_select_image_path->execute();
         $image_path = $stmt_select_image_path->fetchColumn();
     
@@ -97,9 +113,10 @@ class StudentModel
         $stmt_delete_attendances->bindParam(':student_id', $student_id);
         $stmt_delete_attendances->execute();
     
-        $sql_delete_student = "DELETE FROM students WHERE id = :student_id";
+        $sql_delete_student = "DELETE FROM students WHERE id = :student_id AND user_id = :user_id";
         $stmt_delete_student = $this->db->prepare($sql_delete_student);
         $stmt_delete_student->bindParam(':student_id', $student_id);
+        $stmt_delete_student->bindParam(':user_id', $user_id);
         $stmt_delete_student->execute();
     }
 }

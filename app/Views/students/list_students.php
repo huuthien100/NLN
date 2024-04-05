@@ -25,19 +25,21 @@
                             <?php endif; ?>
                         </td>
                         <td>
-                            <form action="index.php" method="GET">
-                                <input type="hidden" name="page" value="update_student">
-                                <input type="hidden" name="id" value="<?= $student['id'] ?>">
-                                <button type="submit" class="btn btn-primary edit-btn">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </form>
-                            <form id="deleteForm<?= $student['id'] ?>" action="index.php?page=delete_student" method="POST">
-                                <input type="hidden" name="id" value="<?= $student['id'] ?>">
-                                <button type="button" onclick="confirmDelete(<?= $student['id'] ?>)" class="btn btn-danger delete-btn">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
+                            <div class="d-flex align-items-center">
+                                <form action="index.php" method="GET" class="mr-2">
+                                    <input type="hidden" name="page" value="update_student">
+                                    <input type="hidden" name="id" value="<?= $student['id'] ?>">
+                                    <button type="submit" class="btn btn-primary edit-btn">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </form>
+                                <form id="deleteForm<?= $student['id'] ?>" action="index.php?page=delete_student" method="POST">
+                                    <input type="hidden" name="id" value="<?= $student['id'] ?>">
+                                    <button type="button" onclick="confirmDelete(<?= $student['id'] ?>)" class="btn btn-danger delete-btn">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -57,8 +59,32 @@
 
 <script>
     $(document).ready(function() {
-        $('#studentTable').DataTable();
-    });
+        $('#studentTable').DataTable({
+            "language": {
+                "sProcessing": "Đang xử lý...",
+                "sLengthMenu": "Hiển thị _MENU_ mục",
+                "sZeroRecords": "Không tìm thấy dữ liệu",
+                "sInfo": "Hiển thị từ _START_ đến _END_ của _TOTAL_ mục",
+                "sInfoEmpty": "Hiển thị từ 0 đến 0 của 0 mục",
+                "sInfoFiltered": "(được lọc từ _MAX_ mục)",
+                "sInfoPostFix": "",
+                "sSearch": "Tìm:",
+                "sUrl": "",
+                "oPaginate": {
+                    "sFirst": "Đầu",
+                    "sPrevious": "Trước",
+                    "sNext": "Tiếp",
+                    "sLast": "Cuối"
+                },
+                "sEmptyTable": "Không có dữ liệu trong bảng",
+                "sLoadingRecords": "Đang tải...",
+                "oAria": {
+                    "sSortAscending": ": Sắp xếp cột tăng dần",
+                    "sSortDescending": ": Sắp xếp cột giảm dần"
+                }
+            }
+        });
+    })
 
     function confirmDelete(studentId) {
         if (confirm('Việc xóa thông tin sinh viên sẽ đồng thời xóa dữ liệu điểm danh, bạn có chắc muốn xóa không?')) {

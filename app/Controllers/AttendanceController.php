@@ -13,9 +13,9 @@ class AttendanceController
         $this->attendanceModel = $attendanceModel;
     }
 
-    public function getAllAttendances()
+    public function getAllAttendances($user_id)
     {
-        $attendances = $this->attendanceModel->getAllAttendances();
+        $attendances = $this->attendanceModel->getAllAttendances($user_id);
 
         return $attendances;
     }

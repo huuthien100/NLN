@@ -1,4 +1,13 @@
 <?php
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+} else {
+    header('Location: login.php');
+    exit();
+}
+
 require_once 'connect.php';
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
@@ -14,34 +23,62 @@ if (!$data || !isset($data['studentname']) || !isset($data['status']) || !isset(
 $studentname = $data['studentname'];
 $status = $data['status'];
 $date = $data['date'];
+$timestamp = strtotime($date);
+$new_date = date('Y-m-d H:i:s', $timestamp);
 
 try {
-    $latestAttendanceSql = "SELECT * FROM attendances WHERE student_id = (SELECT id FROM students WHERE student_name = :studentname) ORDER BY date DESC LIMIT 1";
-    $latestAttendanceStmt = $pdo->prepare($latestAttendanceSql);
-    $latestAttendanceStmt->bindParam(':studentname', $studentname);
-    $latestAttendanceStmt->execute();
-    $latestAttendance = $latestAttendanceStmt->fetch();
+    // 1. Lấy ID của sinh viên từ tên sinh viên
+    $findStudentIdSql = "SELECT id FROM students WHERE student_name = :studentname";
+    $findStudentIdStmt = $pdo->prepare($findStudentIdSql);
+    $findStudentIdStmt->bindParam(':studentname', $studentname);
+    $findStudentIdStmt->execute();
+    $student = $findStudentIdStmt->fetch();
 
-    if ($latestAttendance) {
-        $lastAttendanceTime = strtotime($latestAttendance['date']);
-        $currentTime = strtotime($date);
-        $timeDiff = ($currentTime - $lastAttendanceTime) / 3600;
-
-        if ($timeDiff < 1) {
-            http_response_code(400);
-            echo json_encode(array("message" => "Cannot mark attendance for student $studentname. Only one attendance allowed per hour."));
-            error_log("Cannot mark attendance for student $studentname. Only one attendance allowed per hour.", 3, "error.log");
-            exit();
-        }
+    if (!$student) {
+        http_response_code(400);
+        echo json_encode(array("message" => "Student $studentname not found."));
+        error_log("Student $studentname not found.", 3, "error.log");
+        exit();
     }
 
-    $date_vietnam = date('Y-m-d H:i:s', strtotime($date));
+    // 2. Kiểm tra trong bảng schedules xem sinh viên có thuộc vào buổi học nào không
+    $checkScheduleSql = "SELECT * FROM schedules WHERE FIND_IN_SET(:student_id, students_attending) > 0 AND user_id = :user_id AND start_time <= :date AND end_time > :date";
+    $checkScheduleStmt = $pdo->prepare($checkScheduleSql);
+    $checkScheduleStmt->bindParam(':student_id', $student['id']);
+    $checkScheduleStmt->bindParam(':user_id', $user_id);
+    $checkScheduleStmt->bindParam(':date', $new_date);
+    $checkScheduleStmt->execute();
+    $schedule = $checkScheduleStmt->fetch();
 
-    $insertAttendanceSql = "INSERT INTO attendances (student_id, status, date) VALUES ((SELECT id FROM students WHERE student_name = :studentname), :status, :date)";
+    if (!$schedule) {
+        http_response_code(400);
+        echo json_encode(array("message" => "Student is not scheduled for any class at $new_date."));
+        error_log("Student is not scheduled for any class at $new_date.", 3, "error.log");
+        exit();
+    }
+
+    // 3. Kiểm tra trong bảng attendances xem sinh viên đã được điểm danh trong bất kỳ buổi học nào hay chưa
+    $checkAttendanceSql = "SELECT * FROM attendances WHERE student_id = :student_id AND schedule_id = :schedule_id";
+    $checkAttendanceStmt = $pdo->prepare($checkAttendanceSql);
+    $checkAttendanceStmt->bindParam(':student_id', $student['id']);
+    $checkAttendanceStmt->bindParam(':schedule_id', $schedule['schedule_id']);
+    $checkAttendanceStmt->execute();
+    $existingAttendance = $checkAttendanceStmt->fetch();
+
+    if ($existingAttendance) {
+        http_response_code(400);
+        echo json_encode(array("message" => "Student $studentname has already been marked attendance for this class."));
+        error_log("Student $studentname has already been marked attendance for this class.", 3, "error.log");
+        exit();
+    }
+
+    // 4. Tiến hành điểm danh và thêm thông tin điểm danh mới vào bảng attendances
+    $insertAttendanceSql = "INSERT INTO attendances (schedule_id, student_id, status, date) VALUES (:schedule_id, :student_id, :status, :date)";
     $insertAttendanceStmt = $pdo->prepare($insertAttendanceSql);
-    $insertAttendanceStmt->bindParam(':studentname', $studentname);
+    $insertAttendanceStmt->bindParam(':schedule_id', $schedule['schedule_id']);
+    $insertAttendanceStmt->bindParam(':student_id', $student['id']);
     $insertAttendanceStmt->bindParam(':status', $status);
-    $insertAttendanceStmt->bindParam(':date', $date_vietnam);
+    $insertAttendanceStmt->bindParam(':date', $new_date);
     $insertAttendanceStmt->execute();
 
     http_response_code(200);

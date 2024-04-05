@@ -18,10 +18,10 @@ class StudentController
         $students = $this->studentModel->getAllStudents() ?? [];
         return $students;
     }
+
     public function getStudentById($id)
     {
         $student = $this->studentModel->getStudentById($id);
-
         return $student;
     }
 

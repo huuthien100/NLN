@@ -13,11 +13,13 @@ class AttendanceModel
         $this->db = $db;
     }
 
-    public function getAllAttendances()
+    public function getAllAttendances($user_id)
     {
-        $stmt = $this->db->query('SELECT students.*, attendances.date, attendances.status 
-                              FROM students 
-                              LEFT JOIN attendances ON students.id = attendances.student_id');
+        $stmt = $this->db->prepare('SELECT students.*, attendances.date, attendances.status 
+                                FROM students 
+                                LEFT JOIN attendances ON students.id = attendances.student_id
+                                WHERE students.user_id = :user_id');
+        $stmt->execute(['user_id' => $user_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

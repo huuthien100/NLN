@@ -1,0 +1,2 @@
+import attendance_app.sql phpmyadmin
+httpd-vhosts.conf copy vào C:\xampp\apache\conf\extra

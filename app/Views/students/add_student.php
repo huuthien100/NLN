@@ -1,6 +1,13 @@
 <main class="content">
-    <h1>Thêm thông tin sinh viên</h1>
-    <form action="index.php?page=add_student" method="POST" enctype="multipart/form-data">
+    <h1>Thêm Thông Tin Sinh Viên</h1>
+    <hr>
+    <?php
+    if (isset($_SESSION['error_message'])) {
+        echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+        unset($_SESSION['error_message']);
+    }
+    ?>
+    <form action="index.php?page=add_student" method="POST" enctype="multipart/form-data" id="addStudentForm">
         <div class="form-group">
             <label for="student_name">Họ và Tên</label>
             <input type="text" class="form-control" id="student_name" name="student_name" placeholder="Nhập họ và tên">
@@ -23,7 +30,36 @@
     </form>
 </main>
 
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+    $(document).ready(function() {
+        $('#addStudentForm').submit(function(e) {
+            var studentName = $('#student_name').val();
+            var studentId = $('#student_id').val();
+            var studentClass = $('#class').val();
+            var imageFile = $('#image_path')[0].files[0];
+
+            var studentNameRegex = /^[^\d!@#$%^&*()_+={}\[\]|\\:;\"'<>,.?\/]+$/;
+            var studentIdRegex = /^[a-zA-Z]\d{7}$/;
+            var studentClassRegex = /^[a-zA-Z0-9\s]+$/;
+
+            if (studentName === '' || studentId === '' || studentClass === '' || !imageFile) {
+                alert('Vui lòng nhập đầy đủ thông tin.');
+                e.preventDefault();
+            } else if (!studentName.match(studentNameRegex)) {
+                alert('Họ và tên chỉ được chứa ký tự chữ và dấu cách.');
+                e.preventDefault();
+            } else if (!studentId.match(studentIdRegex)) {
+                alert('MSSV phải có 8 chữ số.');
+                e.preventDefault();
+            } else if (!studentClass.match(studentClassRegex)) {
+                alert('Lớp chỉ được chứa ký tự chữ, số và dấu cách.');
+                e.preventDefault();
+            }
+        });
+    });
+
     function previewImage(input) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
@@ -34,6 +70,8 @@
         }
     }
 </script>
+
+
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

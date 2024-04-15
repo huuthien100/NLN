@@ -15,7 +15,7 @@ class StudentModel
         $this->db = $db;
         $this->session = $session;
     }
-    
+
     public function getAllStudents()
     {
         $user_id = $_SESSION['user_id'];
@@ -38,27 +38,38 @@ class StudentModel
     {
         $user_id = $_SESSION['user_id'];
 
-        $stmt = $this->db->prepare('INSERT INTO students (student_name, student_id, class, image_path, user_id) VALUES (:student_name, :student_id, :class, :image_path, :user_id)');
+        try {
+            $stmt = $this->db->prepare('INSERT INTO students (student_name, student_id, class, image_path, user_id) VALUES (:student_name, :student_id, :class, :image_path, :user_id)');
 
-        $newFileName = $studentData['student_id'] . '.jpg';
-        $studentImageDirectory = "img/studentImage/";
-        $imgUrl = $studentImageDirectory . $newFileName;
+            $newFileName = $studentData['student_id'] . '.jpg';
+            $studentImageDirectory = "img/studentImage/";
+            $imgUrl = $studentImageDirectory . $newFileName;
 
-        if (!is_dir($studentImageDirectory)) {
-            mkdir($studentImageDirectory, 0777, true);
+            if (!is_dir($studentImageDirectory)) {
+                mkdir($studentImageDirectory, 0777, true);
+            }
+
+            $studentData['image_path'] = $imgUrl;
+
+            move_uploaded_file($_FILES['image_path']['tmp_name'], $studentImageDirectory . $newFileName);
+
+            $stmt->execute([
+                'student_name' => $studentData['student_name'],
+                'student_id' => $studentData['student_id'],
+                'class' => $studentData['class'],
+                'image_path' => $studentData['image_path'],
+                'user_id' => $user_id
+            ]);
+
+            return true;
+        } catch (PDOException $e) {
+            if ($e->errorInfo[1] === 1062) {
+                echo "<script>alert('MSSV đã tồn tại trong cơ sở dữ liệu.');</script>";
+            } else {
+                echo "<script>alert('Có lỗi xảy ra khi thêm sinh viên.');</script>";
+            }
+            return false;
         }
-
-        $studentData['image_path'] = $imgUrl;
-
-        move_uploaded_file($_FILES['image_path']['tmp_name'], $studentImageDirectory . $newFileName);
-
-        return $stmt->execute([
-            'student_name' => $studentData['student_name'],
-            'student_id' => $studentData['student_id'],
-            'class' => $studentData['class'],
-            'image_path' => $studentData['image_path'],
-            'user_id' => $user_id
-        ]);
     }
 
     public function updateStudent($id, $studentData)
@@ -103,16 +114,16 @@ class StudentModel
         $stmt_select_image_path->bindParam(':user_id', $user_id);
         $stmt_select_image_path->execute();
         $image_path = $stmt_select_image_path->fetchColumn();
-    
+
         if (!empty($image_path) && file_exists($image_path)) {
             unlink($image_path);
         }
-    
+
         $sql_delete_attendances = "DELETE FROM attendances WHERE student_id = :student_id";
         $stmt_delete_attendances = $this->db->prepare($sql_delete_attendances);
         $stmt_delete_attendances->bindParam(':student_id', $student_id);
         $stmt_delete_attendances->execute();
-    
+
         $sql_delete_student = "DELETE FROM students WHERE id = :student_id AND user_id = :user_id";
         $stmt_delete_student = $this->db->prepare($sql_delete_student);
         $stmt_delete_student->bindParam(':student_id', $student_id);

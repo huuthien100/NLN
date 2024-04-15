@@ -1,5 +1,17 @@
+<?php
+$weekDays = [
+    1 => 'Chủ Nhật',
+    2 => 'Thứ Hai',
+    3 => 'Thứ Ba',
+    4 => 'Thứ Tư',
+    5 => 'Thứ Năm',
+    6 => 'Thứ Sáu',
+    7 => 'Thứ Bảy'
+];
+?>
+
 <main class="content">
-    <h1>Danh Sách Thời Khóa Biểu</h1>
+    <h1>Thời Khóa Biểu</h1>
     <table id="scheduleTable" class="table">
         <thead>
             <tr>
@@ -14,24 +26,20 @@
             <?php if (!empty($schedules)) : ?>
                 <?php foreach ($schedules as $schedule) : ?>
                     <tr class="data-row">
-                        <td><?= $schedule['start_time'] ?> - <?= $schedule['end_time'] ?></td>
-                        <td><?= $schedule['day_of_week'] ?></td>
+                        <td><?= date('d/m H:i', strtotime($schedule['start_time'])) ?> - <?= date('d/m H:i', strtotime($schedule['end_time'])) ?></td>
+                        <td><?= $weekDays[$schedule['day_of_week']] ?></td>
                         <td><?= $schedule['course_name'] ?></td>
                         <td><?= $schedule['classroom'] ?></td>
                         <td>
                             <div class="btn-group" role="group">
+                                <!-- Nút xem -->
                                 <form action="index.php?page=detail_schedule" method="POST">
                                     <input type="hidden" name="id" value="<?= $schedule['schedule_id'] ?>">
                                     <button type="submit" class="btn btn-primary mr-2">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </form>
-                                <form action="update_schedule.php" method="GET">
-                                    <input type="hidden" name="id" value="<?= $schedule['schedule_id'] ?>">
-                                    <button type="submit" class="btn btn-primary mr-2">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </form>
+                                <!-- Nút xóa -->
                                 <form id="deleteForm<?= $schedule['schedule_id'] ?>" action="index.php?page=delete_schedule" method="POST">
                                     <input type="hidden" name="id" value="<?= $schedule['schedule_id'] ?>">
                                     <button type="button" onclick="confirmDelete(<?= $schedule['schedule_id'] ?>)" class="btn btn-danger">
@@ -41,7 +49,6 @@
                             </div>
                         </td>
                     </tr>
-
                 <?php endforeach; ?>
             <?php else : ?>
                 <tr>
@@ -87,12 +94,8 @@
     });
 
     function confirmDelete(scheduleId) {
-        if (confirm('Bạn có chắc muốn xóa buổi học này không?')) {
+        if (confirm('Hành động này sẽ xóa hết dữ liệu điểm danh liên quan! Bạn có chắc muốn xóa buổi học này không?')) {
             document.getElementById('deleteForm' + scheduleId).submit();
         }
-    }
-
-    function viewStudentDetails(scheduleId) {
-        window.location.href = 'student_details.php?schedule_id=' + scheduleId;
     }
 </script>

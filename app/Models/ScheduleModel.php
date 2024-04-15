@@ -46,19 +46,25 @@ class ScheduleModel
         }
     }
 
-    public function updateSchedule($id, $scheduleData)
+    public function updateSchedule($scheduleData)
     {
         try {
-            $stmt = $this->db->prepare('UPDATE schedules SET user_id = :user_id, start_time = :start_time, end_time = :end_time, day_of_week = :day_of_week, course_name = :course_name, classroom = :classroom WHERE schedule_id = :id');
-            $stmt->bindParam(':id', $id);
-            $stmt->bindParam(':user_id', $scheduleData['user_id']);
-            $stmt->bindParam(':start_time', $scheduleData['start_time']);
-            $stmt->bindParam(':end_time', $scheduleData['end_time']);
-            $stmt->bindParam(':day_of_week', $scheduleData['day_of_week']);
-            $stmt->bindParam(':course_name', $scheduleData['course_name']);
-            $stmt->bindParam(':classroom', $scheduleData['classroom']);
+            $stmt = $this->db->prepare('UPDATE schedules 
+                                    SET start_time = :start_time, 
+                                        end_time = :end_time, 
+                                        day_of_week = :day_of_week, 
+                                        course_name = :course_name, 
+                                        classroom = :classroom 
+                                    WHERE schedule_id = :schedule_id');
 
-            return $stmt->execute();
+            return $stmt->execute([
+                'schedule_id' => $scheduleData['schedule_id'],
+                'start_time' => $scheduleData['start_time'],
+                'end_time' => $scheduleData['end_time'],
+                'day_of_week' => $scheduleData['day_of_week'],
+                'course_name' => $scheduleData['course_name'],
+                'classroom' => $scheduleData['classroom']
+            ]);
         } catch (PDOException $e) {
             return false;
         }
@@ -69,7 +75,14 @@ class ScheduleModel
         $sql_delete_schedule = "DELETE FROM schedules WHERE schedule_id = :schedule_id";
         $stmt_delete_schedule = $this->db->prepare($sql_delete_schedule);
         $stmt_delete_schedule->bindParam(':schedule_id', $schedule_id);
-        return $stmt_delete_schedule->execute();
+        $stmt_delete_schedule->execute();
+
+        $sql_delete_attendance = "DELETE FROM attendances WHERE schedule_id = :schedule_id";
+        $stmt_delete_attendance = $this->db->prepare($sql_delete_attendance);
+        $stmt_delete_attendance->bindParam(':schedule_id', $schedule_id);
+        $stmt_delete_attendance->execute();
+
+        return $stmt_delete_schedule->rowCount();
     }
 
     public function assignStudentsToSchedule($schedule_id, $student_ids)
@@ -96,7 +109,6 @@ class ScheduleModel
         }
     }
 
-
     public function getStudentsAttending($schedule_id)
     {
         try {
@@ -119,29 +131,39 @@ class ScheduleModel
         }
     }
 
-    public function removeStudentsFromSchedule($schedule_id, $student_id)
+    public function removeStudentFromSchedule($scheduleId, $studentId)
     {
+        $sql = "SELECT students_attending FROM schedules WHERE schedule_id = :schedule_id";
+
         try {
-            $stmt = $this->db->prepare('SELECT students_attending FROM schedules WHERE schedule_id = :schedule_id');
-            $stmt->execute(['schedule_id' => $schedule_id]);
-            $current_students = $stmt->fetch(PDO::FETCH_ASSOC)['students_attending'];
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':schedule_id', $scheduleId, PDO::PARAM_INT);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($current_students !== null) {
-                $current_students_array = explode(',', $current_students);
+            if ($result) {
+                $studentsAttending = explode(',', $result['students_attending']);
 
-                $key = array_search($student_id, $current_students_array);
+                $key = array_search($studentId, $studentsAttending);
+
                 if ($key !== false) {
-                    unset($current_students_array[$key]);
+                    unset($studentsAttending[$key]);
                 }
-                $new_student_ids = implode(',', $current_students_array);
 
-                $stmt = $this->db->prepare('UPDATE schedules SET students_attending = :new_student_ids WHERE schedule_id = :schedule_id');
-                $stmt->bindParam(':schedule_id', $schedule_id);
-                $stmt->bindParam(':new_student_ids', $new_student_ids);
-                $stmt->execute();
+                $updatedStudentsAttending = implode(',', $studentsAttending);
+
+                $updateSql = "UPDATE schedules SET students_attending = :students_attending WHERE schedule_id = :schedule_id";
+                $updateStmt = $this->db->prepare($updateSql);
+                $updateStmt->bindParam(':students_attending', $updatedStudentsAttending, PDO::PARAM_STR);
+                $updateStmt->bindParam(':schedule_id', $scheduleId, PDO::PARAM_INT);
+                $updateStmt->execute();
+
+                return true;
+            } else {
+                return false;
             }
-            return true;
         } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
             return false;
         }
     }

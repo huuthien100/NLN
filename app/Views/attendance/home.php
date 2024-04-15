@@ -45,11 +45,11 @@
             <main class="content">
                 <h1>Ứng dụng Điểm danh</h1>
                 <p>Chào mừng bạn đến với ứng dụng điểm danh!</p>
-                <p>Ứng dụng này tích hợp chức năng điểm danh bằng nhận diện khuôn mặt với face-api.js.</p>
+                <p>Ứng dụng điểm danh bằng nhận diện khuôn mặt với face-api.js.</p>
                 <p>Tạo bởi sinh viên: Nguyễn Hữu Thiên</p>
                 <p>MSSV: B2014879</p>
-                <p>© 2024 Ứng dụng Điểm danh. Tất cả các quyền được bảo lưu.</p>
-
+                <p>© 2024 Ứng dụng Điểm danh.</p>
+                <iframe src="https://giphy.com/embed/Wj7lNjMNDxSmc" width="480" height="349" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
             </main>
         </div>
     </div>

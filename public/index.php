@@ -13,6 +13,11 @@ require '../vendor/autoload.php';
 require 'config/connect.php';
 
 session_start();
+if ($_SERVER['REQUEST_URI'] === '/') {
+    setcookie('PHPSESSID', '', time() - 3600, '/');
+    header("Location: index.php?page=login");
+    exit;
+}
 
 $user_id = $_SESSION['user_id'] ?? null;
 
@@ -46,7 +51,7 @@ if (isset($_GET['page'])) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
                 $student = $studentController->getStudentById($_GET['id']);
                 if ($student) {
-                    require_once __DIR__ . '../../app/views/student/update_student.php';
+                    require_once __DIR__ . '../../app/views/students/update_student.php';
                 } else {
                     echo "Student not found.";
                 }
@@ -80,23 +85,6 @@ if (isset($_GET['page'])) {
                 require_once __DIR__ . '../../app/views/schedule/add_schedule.php';
             }
             break;
-        case 'update_schedule':
-            if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
-                $schedule = $scheduleController->getScheduleById($_GET['id']);
-                if ($schedule) {
-                    require_once __DIR__ . '../../app/views/schedule/update_schedule.php';
-                } else {
-                    echo "Schedule not found.";
-                }
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
-                $id = $_POST['id'];
-                $scheduleController->updateSchedule($id);
-                header("Location: index.php?page=list_schedules");
-                exit;
-            } else {
-                echo "Invalid request.";
-            }
-            break;
         case 'delete_schedule':
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                 $id = $_POST['id'];
@@ -112,9 +100,11 @@ if (isset($_GET['page'])) {
         case 'detail_schedule':
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                 $scheduleId = $_POST['id'];
+
                 $schedule = $scheduleController->getScheduleById($scheduleId);
                 $students = $scheduleController->getStudentsAttending($scheduleId);
                 $attendances = $attendanceController->getAllAttendances($user_id);
+
                 require_once __DIR__ . '../../app/views/schedule/detail_schedule.php';
             } else {
                 echo "Invalid request.";
@@ -133,12 +123,18 @@ if (isset($_GET['page'])) {
                 require_once __DIR__ . '../../app/views/schedule/add_student_to_schedule.php';
             }
             break;
+        case 'remove_student_from_schedule':
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['schedule_id']) && isset($_POST['remove_student_id'])) {
+                $scheduleId = $_POST['schedule_id'];
+                $studentId = $_POST['remove_student_id'];
+
+                $scheduleController->removeStudentFromSchedule($scheduleId, $studentId);
+            } else {
+                echo "Invalid request.";
+            }
+            break;
         case 'attendance':
             require_once __DIR__ . '../../app/views/attendance/attendance.php';
-            break;
-        case 'attendance_session':
-            $attendances = $attendanceController->getAllAttendances($user_id);
-            require_once __DIR__ . '../../app/views/attendance/attendance_session.php';
             break;
         case 'login':
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {

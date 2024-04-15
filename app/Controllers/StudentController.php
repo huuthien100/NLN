@@ -26,23 +26,26 @@ class StudentController
     }
 
     public function addStudent()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $studentData = [
-                'student_name' => $_POST['student_name'],
-                'student_id' => $_POST['student_id'],
-                'class' => $_POST['class']
-            ];
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $studentData = [
+            'student_name' => $_POST['student_name'],
+            'student_id' => $_POST['student_id'],
+            'class' => $_POST['class']
+        ];
 
-            $result = $this->studentModel->addStudent($studentData);
+        $result = $this->studentModel->addStudent($studentData);
 
-            if ($result) {
-                echo "Thêm sinh viên thành công.";
-            } else {
-                echo "Thêm sinh viên thất bại.";
-            }
+        if ($result) {
+            header("Location: index.php?page=list_students");
+            exit;
+        } else {
+            $_SESSION['error_message'] = "Sinh viên đã tồn tại.";
+            header("Location: index.php?page=add_student");
+            exit;
         }
     }
+}
 
     public function updateStudent($id)
     {

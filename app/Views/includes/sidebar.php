@@ -36,12 +36,8 @@
             <li class="nav-item">
                 <a class="nav-link" href="index.php?page=list_schedules">THỜI KHÓA BIỂU</a>
             </li>
-            
             <li class="nav-item">
-                <a class="nav-link" href="index.php?page=attendance_session">BUỔI ĐIỂM DANH</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="index.php?page=logout">LOGOUT</a>
+                <a class="nav-link" href="index.php?page=logout">ĐĂNG XUẤT</a>
             </li>
         </ul>
     </nav>

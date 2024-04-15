@@ -47,11 +47,11 @@ class ScheduleController
         }
     }
 
-    public function updateSchedule($id)
+    public function updateSchedule()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $scheduleData = [
-                'user_id' => $_POST['user_id'],
+                'schedule_id' => $_POST['schedule_id'],
                 'start_time' => $_POST['start_time'],
                 'end_time' => $_POST['end_time'],
                 'day_of_week' => $_POST['day_of_week'],
@@ -59,7 +59,7 @@ class ScheduleController
                 'classroom' => $_POST['classroom']
             ];
 
-            $result = $this->scheduleModel->updateSchedule($id, $scheduleData);
+            $result = $this->scheduleModel->updateSchedule($scheduleData);
 
             if ($result) {
                 echo "Cập nhật thời khóa biểu thành công.";
@@ -79,7 +79,6 @@ class ScheduleController
             echo "Xóa thời khóa biểu thất bại.";
         }
     }
-
     public function assignStudentsToSchedule()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -89,9 +88,9 @@ class ScheduleController
             $result = $this->scheduleModel->assignStudentsToSchedule($schedule_id, $student_ids);
 
             if ($result) {
-                echo "Gán học sinh vào buổi học thành công.";
+                echo "Thêm học sinh vào buổi học thành công.";
             } else {
-                echo "Đã xảy ra lỗi khi gán học sinh vào buổi học.";
+                echo "Đã xảy ra lỗi khi thêm học sinh vào buổi học.";
             }
         }
     }
@@ -102,12 +101,15 @@ class ScheduleController
         return $students;
     }
 
-    public function removeStudentsFromSchedule($schedule_id, $student_id)
+    public function removeStudentFromSchedule($scheduleId, $studentId)
     {
-        if ($this->scheduleModel->removeStudentsFromSchedule($schedule_id, $student_id)) {
-            return true;
+        $result = $this->scheduleModel->removeStudentFromSchedule($scheduleId, $studentId);
+
+        if ($result) {
+            header("Location: index.php?page=list_schedules");
+            exit();
         } else {
-            return false;
+            echo "Có lỗi xảy ra khi xóa sinh viên ra khỏi lịch học.";
         }
     }
 }

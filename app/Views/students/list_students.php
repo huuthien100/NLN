@@ -1,13 +1,13 @@
 <main class="content">
-    <h1>Danh sách sinh viên</h1>
+    <h1>Danh Sách Sinh Viên</h1>
     <table id="studentTable" class="table">
         <thead>
             <tr>
-                <th scope="col">Họ và tên</th>
+                <th scope="col">Họ và Tên</th>
                 <th scope="col">MSSV</th>
                 <th scope="col">Lớp</th>
-                <th scope="col">Hình ảnh</th>
-                <th scope="col">Hành động</th>
+                <th scope="col">Hình Ảnh</th>
+                <th scope="col">Hành Động</th>
             </tr>
         </thead>
         <tbody>
